@@ -1,0 +1,6 @@
+# Phase 8 — Gemini via Vertex AI / Google Gen AI SDK.
+# Do not install until retrieval (Phase 7) is working.
+#
+#   pip install -r requirements-ai.txt
+
+google-genai==1.5.0

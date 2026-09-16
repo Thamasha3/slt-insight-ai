@@ -1,0 +1,37 @@
+# Secrets — never commit
+.env
+.env.local
+*.pem
+infiniai.json
+**/infiniai.json
+*credentials*.json
+service-account*.json
+insighthub*.json
+backend/secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv*/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Uploads / local data
+backend/uploads/
+*.log
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

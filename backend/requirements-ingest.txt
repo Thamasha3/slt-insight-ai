@@ -1,0 +1,9 @@
+# Phase 6 — document ingestion. Install after auth/RBAC works:
+#   pip install -r requirements-ingest.txt
+#
+# If pip tries to compile pandas from source, use Python 3.12.
+
+pandas>=2.2.3
+openpyxl==3.1.5
+PyMuPDF==1.25.3
+python-docx==1.1.2
