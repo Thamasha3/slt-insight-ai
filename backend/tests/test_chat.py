@@ -149,9 +149,7 @@ async def test_admin_chat_never_calls_gemini(client, capture_gemini):
         headers={"Authorization": f"Bearer {token}"},
         json={"query": "annual leave policy"},
     )
-    assert response.status_code == 200
-    assert response.json()["gemini_called"] is False
-    assert response.json()["insufficient_evidence"] is True
+    assert response.status_code == 403
     assert capture_gemini == []
 
 

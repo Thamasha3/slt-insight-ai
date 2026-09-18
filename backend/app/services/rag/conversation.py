@@ -83,10 +83,10 @@ def is_small_talk(query: str) -> bool:
     return False
 
 
-def small_talk_reply(user: CurrentUser, query: str) -> str:
+def small_talk_reply(user: CurrentUser, query: str, *, admin_chat_enabled: bool = False) -> str:
     first = (user.name or "there").split()[0]
     cleaned = normalize_utterance(query)
-    categories = allowed_category_list(user)
+    categories = allowed_category_list(user, admin_chat_enabled=admin_chat_enabled)
 
     if cleaned in {"thanks", "thank you", "thank you so much", "thx"}:
         return f"You're welcome, {first}. Ask another question whenever you need to."

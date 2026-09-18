@@ -1,5 +1,7 @@
 """Employee chat. Gemini is called only after RBAC retrieval."""
 
+from datetime import datetime, timedelta, timezone
+
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -8,6 +10,7 @@ from app.database.connection import chat_messages_collection, chat_sessions_coll
 from app.schemas.chat import ChatAskRequest, ChatAskResponse, ChatMessageOut, ChatSessionOut
 from app.schemas.retrieval import RetrievedChunkOut
 from app.services.rag.chat import answer_employee_question
+from app.services.system_settings import get_system_settings
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -59,7 +62,15 @@ async def ask_chat(payload: ChatAskRequest, user: CurrentUser = Depends(get_curr
 
 @router.get("/sessions", response_model=list[ChatSessionOut])
 async def list_sessions(user: CurrentUser = Depends(get_current_user)):
-    cursor = chat_sessions_collection().find({"user_id": user.id}).sort("updated_at", -1).limit(50)
+    stored = await get_system_settings()
+    days = int(stored.get("chat_history_retention_days") or 90)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    cursor = (
+        chat_sessions_collection()
+        .find({"user_id": user.id, "updated_at": {"$gte": cutoff}})
+        .sort("updated_at", -1)
+        .limit(50)
+    )
     return [_session_out(document) async for document in cursor]
 
 

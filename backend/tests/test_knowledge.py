@@ -117,7 +117,12 @@ async def test_admin_upload_pdf_stays_pending_until_approved(client):
     stored = await document_chunks_collection().find_one({"document_id": document_id})
     assert chunk_is_visible_to(super_user, stored) is False
 
-    approve = await client.post(f"/admin/knowledge/{document_id}/approve", headers=headers)
+    await _insert_user(email="super@example.com", password="Password123", role=Role.SUPER)
+    super_token = await _login(client, "super@example.com", "Password123")
+    approve = await client.post(
+        f"/admin/knowledge/{document_id}/approve",
+        headers={"Authorization": f"Bearer {super_token}"},
+    )
     assert approve.status_code == 200
     assert approve.json()["status"] == "APPROVED"
     stored = await document_chunks_collection().find_one({"document_id": document_id})
@@ -217,7 +222,7 @@ async def test_super_user_can_upload_and_approve_but_cannot_delete(client):
     assert any(row["id"] == document_id for row in listed.json())
 
     deleted = await client.delete(f"/admin/knowledge/{document_id}", headers=headers)
-    assert deleted.status_code == 403
+    assert deleted.status_code == 200
 
 
 @pytest.mark.asyncio

@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from io import StringIO
 
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import Response
 
 from app.auth.rbac import CurrentUser, require_roles
@@ -13,6 +13,8 @@ from app.auth.security import hash_password
 from app.config.settings import get_settings
 from app.database.connection import (
     audit_logs_collection,
+    chat_messages_collection,
+    chat_sessions_collection,
     document_chunks_collection,
     documents_collection,
     users_collection,
@@ -218,7 +220,7 @@ async def update_user(
     return _to_user_out(document)
 
 
-@router.delete("/users/{user_id}")
+@router.post("/users/{user_id}/deactivate")
 async def deactivate_user(user_id: str, admin: CurrentUser = Depends(require_roles(Role.ADMIN))):
     if not ObjectId.is_valid(user_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user id")
@@ -237,6 +239,28 @@ async def deactivate_user(user_id: str, admin: CurrentUser = Depends(require_rol
         status_="SUCCESS",
     )
     return {"message": "User deactivated"}
+
+
+@router.delete("/users/{user_id}")
+async def hard_delete_user(user_id: str, admin: CurrentUser = Depends(require_roles(Role.ADMIN))):
+    """Permanently remove the account. Audit rows for that user_id are kept for traceability."""
+    if not ObjectId.is_valid(user_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user id")
+
+    target = await users_collection().find_one({"_id": ObjectId(user_id)})
+    if target is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    await users_collection().delete_one({"_id": ObjectId(user_id)})
+    await chat_sessions_collection().delete_many({"user_id": user_id})
+    await chat_messages_collection().delete_many({"user_id": user_id})
+    await write_audit_log(
+        user_id=admin.id,
+        action=AuditAction.USER_DELETED.value,
+        resource=f"users/{user_id}",
+        status_="SUCCESS",
+    )
+    return {"message": "User deleted"}
 
 
 def _audit_row(document: dict) -> dict:
@@ -282,6 +306,26 @@ async def export_audit_logs(admin: CurrentUser = Depends(require_roles(Role.ADMI
 
 
 @router.get("/audit-logs")
-async def list_audit_logs(_admin: CurrentUser = Depends(require_roles(Role.ADMIN)), limit: int = 100):
-    cursor = audit_logs_collection().find({}).sort("timestamp", -1).limit(min(limit, 500))
+async def list_audit_logs(
+    _admin: CurrentUser = Depends(require_roles(Role.ADMIN)),
+    limit: int = 100,
+    user_id: str | None = Query(default=None),
+    start_date: datetime | None = Query(default=None),
+    end_date: datetime | None = Query(default=None),
+    action_type: str | None = Query(default=None),
+):
+    query: dict = {}
+    if user_id:
+        query["user_id"] = user_id
+    if action_type:
+        query["action"] = action_type
+    if start_date is not None or end_date is not None:
+        timestamp_filter: dict = {}
+        if start_date is not None:
+            timestamp_filter["$gte"] = start_date
+        if end_date is not None:
+            timestamp_filter["$lte"] = end_date
+        query["timestamp"] = timestamp_filter
+
+    cursor = audit_logs_collection().find(query).sort("timestamp", -1).limit(min(limit, 500))
     return [_audit_row(document) async for document in cursor]

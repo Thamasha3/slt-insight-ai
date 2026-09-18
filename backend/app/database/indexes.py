@@ -30,3 +30,4 @@ async def create_indexes() -> None:
 
     await audit_logs_collection().create_index("user_id")
     await audit_logs_collection().create_index("timestamp")
+    await audit_logs_collection().create_index("action")

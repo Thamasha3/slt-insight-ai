@@ -17,6 +17,8 @@ import re
 
 from app.auth.rbac import CurrentUser, allowed_categories_for, chunk_is_visible_to, retrieval_mongo_filter
 from app.database.connection import document_chunks_collection
+from app.models.user import Role
+from app.services.system_settings import get_system_settings
 
 _TOKEN = re.compile(r"[a-z0-9]+")
 _STOP = {
@@ -78,14 +80,19 @@ def score_chunk(query: str, content: str) -> float:
 
 
 async def search_visible_chunks(user: CurrentUser, query: str, *, limit: int = 8) -> list[dict]:
-    mongo_filter = retrieval_mongo_filter(user)
+    admin_chat_enabled = False
+    if user.role == Role.ADMIN.value:
+        stored = await get_system_settings()
+        admin_chat_enabled = bool(stored.get("admin_chat_enabled"))
+
+    mongo_filter = retrieval_mongo_filter(user, admin_chat_enabled=admin_chat_enabled)
     if mongo_filter is None:
         return []
 
     cursor = document_chunks_collection().find(mongo_filter)
     scored: list[tuple[float, dict]] = []
     async for chunk in cursor:
-        if not chunk_is_visible_to(user, chunk):
+        if not chunk_is_visible_to(user, chunk, admin_chat_enabled=admin_chat_enabled):
             continue
         searchable = f"{chunk.get('filename') or ''} {chunk.get('content') or ''}"
         points = score_chunk(query, searchable)
@@ -116,5 +123,5 @@ async def search_visible_chunks(user: CurrentUser, query: str, *, limit: int = 8
     return matches
 
 
-def allowed_category_list(user: CurrentUser) -> list[str]:
-    return sorted(allowed_categories_for(user))
+def allowed_category_list(user: CurrentUser, *, admin_chat_enabled: bool = False) -> list[str]:
+    return sorted(allowed_categories_for(user, admin_chat_enabled=admin_chat_enabled))

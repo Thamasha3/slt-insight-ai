@@ -31,7 +31,7 @@ async def test_register_creates_pending_normal_account(client):
         "/auth/register",
         json={
             "name": "Test Employee",
-            "email": "employee1@example.com",
+            "email": "employee1@slt.com.lk",
             "password": "Password123",
             "requested_region": "SOUTHERN",
         },
@@ -41,7 +41,7 @@ async def test_register_creates_pending_normal_account(client):
 
     login = await client.post(
         "/auth/login",
-        json={"email": "employee1@example.com", "password": "Password123"},
+        json={"email": "employee1@slt.com.lk", "password": "Password123"},
     )
     assert login.status_code == 403
     assert "pending" in login.json()["detail"].lower()

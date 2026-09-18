@@ -15,6 +15,7 @@ from app.database.connection import chat_messages_collection, chat_sessions_coll
 from app.models.audit import AuditAction
 from app.models.chat import new_chat_message, new_chat_session, session_title_from_query
 from app.models.document import DocumentStatus
+from app.models.user import Role
 from app.services.rag.citations import filter_authorized_to_cited, prose_without_trailing_bibliography
 from app.services.rag.conversation import (
     NO_EVIDENCE_REPLY,
@@ -29,6 +30,7 @@ from app.services.rag.gemini import (
     generate_answer,
 )
 from app.services.rag.retrieve import allowed_category_list, search_visible_chunks
+from app.services.system_settings import get_system_settings
 from app.utils.audit import write_audit_log
 
 
@@ -89,12 +91,22 @@ async def answer_employee_question(
     limit: int = 8,
 ) -> dict:
     history: list[dict] = []
+    admin_chat_enabled = False
+    if user.role == Role.ADMIN.value:
+        stored = await get_system_settings()
+        admin_chat_enabled = bool(stored.get("admin_chat_enabled"))
+        if not admin_chat_enabled:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin chatbot access is disabled by system settings.",
+            )
+
     if session_id:
         await _get_owned_session(user, session_id)
         history = await _session_history(user.id, session_id)
 
     if is_small_talk(query):
-        answer = small_talk_reply(user, query)
+        answer = small_talk_reply(user, query, admin_chat_enabled=admin_chat_enabled)
         return await _persist_turn(
             user,
             query=query,
@@ -103,6 +115,7 @@ async def answer_employee_question(
             authorized=[],
             gemini_called=False,
             insufficient=False,
+            admin_chat_enabled=admin_chat_enabled,
         )
 
     prior_user = [turn["content"] for turn in history if turn.get("role") == "user"]
@@ -114,7 +127,7 @@ async def answer_employee_question(
             **match,
             "status": DocumentStatus.APPROVED.value,
         }
-        if chunk_is_visible_to(user, gate_chunk):
+        if chunk_is_visible_to(user, gate_chunk, admin_chat_enabled=admin_chat_enabled):
             authorized.append(match)
 
     insufficient = len(authorized) == 0
@@ -150,6 +163,7 @@ async def answer_employee_question(
         authorized=authorized,
         gemini_called=gemini_called,
         insufficient=insufficient,
+        admin_chat_enabled=admin_chat_enabled,
     )
 
 
@@ -162,6 +176,7 @@ async def _persist_turn(
     authorized: list[dict],
     gemini_called: bool,
     insufficient: bool,
+    admin_chat_enabled: bool = False,
 ) -> dict:
     if session_id:
         session = await _get_owned_session(user, session_id)
@@ -206,7 +221,7 @@ async def _persist_turn(
         "answer": answer,
         "insufficient_evidence": insufficient,
         "gemini_called": gemini_called,
-        "allowed_categories": allowed_category_list(user),
+        "allowed_categories": allowed_category_list(user, admin_chat_enabled=admin_chat_enabled),
         "region_filter": region_filter_for(user),
         "citations": citations,
     }

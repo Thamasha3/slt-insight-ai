@@ -26,6 +26,7 @@ class CurrentUser:
         self.role: str = doc["role"]
         self.region: str | None = doc.get("region")
         self.status: str = doc["status"]
+        self.avatar_url: str | None = doc.get("avatar_url")
 
 
 async def get_current_user(
@@ -68,18 +69,24 @@ def require_roles(*allowed_roles: Role):
     return _dependency
 
 
-def allowed_categories_for(user: CurrentUser) -> set[str]:
+def allowed_categories_for(user: CurrentUser, *, admin_chat_enabled: bool = False) -> set[str]:
     """
     Knowledge categories this user may retrieve (Phase 7).
 
-    Admin is NOT given Super-User knowledge access by default.
-    See docs/ambiguities.md item 1.
+    Admin is NOT given Super-User knowledge access unless system settings
+    enable `admin_chat_enabled`.
     """
     if user.role == Role.NORMAL.value:
         return {KnowledgeCategory.GENERAL.value}
     if user.role == Role.REGIONAL.value:
         return {KnowledgeCategory.GENERAL.value, KnowledgeCategory.REGIONAL.value}
     if user.role == Role.SUPER.value:
+        return {
+            KnowledgeCategory.GENERAL.value,
+            KnowledgeCategory.REGIONAL.value,
+            KnowledgeCategory.CONFIDENTIAL_INTERNAL.value,
+        }
+    if user.role == Role.ADMIN.value and admin_chat_enabled:
         return {
             KnowledgeCategory.GENERAL.value,
             KnowledgeCategory.REGIONAL.value,
@@ -95,14 +102,14 @@ def region_filter_for(user: CurrentUser) -> str | None:
     return None
 
 
-def retrieval_mongo_filter(user: CurrentUser) -> dict | None:
+def retrieval_mongo_filter(user: CurrentUser, *, admin_chat_enabled: bool = False) -> dict | None:
     """
     MongoDB filter for permission-aware retrieval.
 
-    Returns None when the role has no knowledge categories (Admin, until SLT
-    defines Admin chat access). Callers must treat None as "return nothing".
+    Returns None when the role has no knowledge categories (Admin, until
+    `admin_chat_enabled` is turned on). Callers must treat None as "return nothing".
     """
-    categories = allowed_categories_for(user)
+    categories = allowed_categories_for(user, admin_chat_enabled=admin_chat_enabled)
     if not categories:
         return None
 
@@ -123,7 +130,7 @@ def retrieval_mongo_filter(user: CurrentUser) -> dict | None:
     return {"status": DocumentStatus.APPROVED.value, "$or": clauses}
 
 
-def chunk_is_visible_to(user: CurrentUser, chunk: dict) -> bool:
+def chunk_is_visible_to(user: CurrentUser, chunk: dict, *, admin_chat_enabled: bool = False) -> bool:
     """
     Server-side retrieval gate. Wired into RAG in Phase 7.
 
@@ -135,7 +142,7 @@ def chunk_is_visible_to(user: CurrentUser, chunk: dict) -> bool:
     if chunk.get("status") != DocumentStatus.APPROVED.value:
         return False
     category = chunk.get("category")
-    if category not in allowed_categories_for(user):
+    if category not in allowed_categories_for(user, admin_chat_enabled=admin_chat_enabled):
         return False
     if category == KnowledgeCategory.REGIONAL.value:
         allowed_region = region_filter_for(user)

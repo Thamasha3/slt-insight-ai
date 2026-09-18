@@ -1,7 +1,7 @@
 """Knowledge-source management.
 
-Admin and Super User may upload, preview, and approve/reject documents.
-Document deletion remains Admin-only. Regional and Normal users cannot call these endpoints.
+Admin and Super User may upload and preview documents.
+Categorize/update, validate/approve, reject, and delete are Super User only.
 """
 
 from datetime import datetime, timezone
@@ -29,6 +29,7 @@ from app.utils.audit import write_audit_log
 
 router = APIRouter(prefix="/admin/knowledge", tags=["admin-knowledge"])
 require_knowledge_steward = require_roles(Role.ADMIN, Role.SUPER)
+require_super_user = require_roles(Role.SUPER)
 
 
 def _to_out(document: dict) -> DocumentOut:
@@ -282,7 +283,7 @@ async def list_chunks(document_id: str, _steward: CurrentUser = Depends(require_
 async def update_knowledge(
     document_id: str,
     payload: DocumentUpdateRequest,
-    actor: CurrentUser = Depends(require_knowledge_steward),
+    actor: CurrentUser = Depends(require_super_user),
 ):
     document = await _get_document_or_404(document_id)
     updates: dict = {}
@@ -315,7 +316,7 @@ async def update_knowledge(
 
 
 @router.post("/{document_id}/approve", response_model=DocumentOut)
-async def approve_knowledge(document_id: str, actor: CurrentUser = Depends(require_knowledge_steward)):
+async def approve_knowledge(document_id: str, actor: CurrentUser = Depends(require_super_user)):
     document = await _get_document_or_404(document_id)
     if document["status"] not in {DocumentStatus.PENDING.value, DocumentStatus.REJECTED.value}:
         raise HTTPException(
@@ -347,7 +348,7 @@ async def approve_knowledge(document_id: str, actor: CurrentUser = Depends(requi
 
 
 @router.post("/{document_id}/reject", response_model=DocumentOut)
-async def reject_knowledge(document_id: str, actor: CurrentUser = Depends(require_knowledge_steward)):
+async def reject_knowledge(document_id: str, actor: CurrentUser = Depends(require_super_user)):
     document = await _get_document_or_404(document_id)
     if document["status"] not in {DocumentStatus.PENDING.value, DocumentStatus.APPROVED.value}:
         raise HTTPException(
@@ -374,7 +375,7 @@ async def reject_knowledge(document_id: str, actor: CurrentUser = Depends(requir
 
 
 @router.delete("/{document_id}")
-async def delete_knowledge(document_id: str, admin: CurrentUser = Depends(require_roles(Role.ADMIN))):
+async def delete_knowledge(document_id: str, actor: CurrentUser = Depends(require_super_user)):
     document = await _get_document_or_404(document_id)
     stored = document.get("stored_path")
     if stored:
@@ -390,7 +391,7 @@ async def delete_knowledge(document_id: str, admin: CurrentUser = Depends(requir
     await document_chunks_collection().delete_many({"document_id": document_id})
     await documents_collection().delete_one({"_id": ObjectId(document_id)})
     await write_audit_log(
-        user_id=admin.id,
+        user_id=actor.id,
         action=AuditAction.DOCUMENT_DELETED.value,
         resource=f"documents/{document_id}",
         status_="SUCCESS",

@@ -4,8 +4,10 @@ from fastapi import APIRouter, Depends
 
 from app.auth.rbac import CurrentUser, get_current_user, region_filter_for
 from app.models.audit import AuditAction
+from app.models.user import Role
 from app.schemas.retrieval import RetrievedChunkOut, RetrievalSearchRequest, RetrievalSearchResponse
 from app.services.rag.retrieve import allowed_category_list, search_visible_chunks
+from app.services.system_settings import get_system_settings
 from app.utils.audit import write_audit_log
 
 router = APIRouter(prefix="/retrieval", tags=["retrieval"])
@@ -17,6 +19,10 @@ async def search_knowledge(
     user: CurrentUser = Depends(get_current_user),
 ):
     matches = await search_visible_chunks(user, payload.query.strip(), limit=payload.limit)
+    admin_chat_enabled = False
+    if user.role == Role.ADMIN.value:
+        stored = await get_system_settings()
+        admin_chat_enabled = bool(stored.get("admin_chat_enabled"))
     await write_audit_log(
         user_id=user.id,
         action=AuditAction.DATA_ACCESS.value,
@@ -25,7 +31,7 @@ async def search_knowledge(
     )
     return RetrievalSearchResponse(
         query=payload.query.strip(),
-        allowed_categories=allowed_category_list(user),
+        allowed_categories=allowed_category_list(user, admin_chat_enabled=admin_chat_enabled),
         region_filter=region_filter_for(user),
         insufficient_evidence=len(matches) == 0,
         matches=[RetrievedChunkOut(**item) for item in matches],

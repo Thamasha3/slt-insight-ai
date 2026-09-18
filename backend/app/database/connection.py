@@ -72,3 +72,7 @@ def chat_messages_collection():
 
 def audit_logs_collection():
     return get_db()["audit_logs"]
+
+
+def system_settings_collection():
+    return get_db()["system_settings"]

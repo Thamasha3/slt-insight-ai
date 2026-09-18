@@ -15,7 +15,7 @@ from fastapi.responses import RedirectResponse # Added import here
 from app.config.settings import get_settings
 from app.database.connection import close_mongo_connection, connect_to_mongo
 from app.database.indexes import create_indexes
-from app.routers import admin, auth, chat, knowledge, retrieval, users
+from app.routers import admin, auth, chat, knowledge, retrieval, settings as system_settings, users
 
 
 @asynccontextmanager
@@ -45,6 +45,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(admin.router)
+app.include_router(system_settings.router)
 app.include_router(knowledge.router)
 app.include_router(retrieval.router)
 app.include_router(chat.router)

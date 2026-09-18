@@ -12,7 +12,7 @@ from app.config.settings import get_settings
 from app.database.connection import users_collection
 from app.models.audit import AuditAction
 from app.models.user import Role, UserStatus, new_user_document
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
+from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, is_slt_corporate_email
 from app.utils.audit import write_audit_log
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -22,6 +22,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def register(payload: RegisterRequest):
     settings = get_settings()
     email = payload.email.strip().lower()
+
+    if not is_slt_corporate_email(email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Registration is limited to @slt.com.lk email addresses.",
+        )
 
     if email in settings.admin_emails:
         raise HTTPException(
