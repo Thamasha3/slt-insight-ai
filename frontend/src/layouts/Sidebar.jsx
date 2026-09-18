@@ -4,10 +4,12 @@ import {
   LogOut,
   MessageSquarePlus,
   Search,
+  Settings,
   Shield,
   UserRound,
   X,
 } from "lucide-react";
+import Avatar from "../components/Avatar.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useChat } from "../context/ChatContext.jsx";
 
@@ -30,18 +32,9 @@ function groupSessions(sessions) {
   return { today, previous };
 }
 
-function initials(name) {
-  return (name || "U")
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join("");
-}
-
 const navClass = ({ isActive }) =>
   `flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition ${
-    isActive ? "bg-teal-50 text-[#064e3b]" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+    isActive ? "bg-slt-blue/10 text-slt-blue" : "text-slate-600 hover:bg-page hover:text-ink"
   }`;
 
 export default function Sidebar({ open, onClose }) {
@@ -80,12 +73,12 @@ export default function Sidebar({ open, onClose }) {
       >
         <div className="flex items-center justify-between px-4 pb-2 pt-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#064e3b] text-sm font-bold text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slt-blue text-sm font-bold text-white">
               SLT
             </div>
             <div>
-              <p className="text-sm font-semibold tracking-tight text-slate-900">SLT insight.ai</p>
-              <p className="text-[11px] text-slate-500">Internal assistant</p>
+              <p className="text-sm font-semibold tracking-tight text-ink">SLT insight.ai</p>
+              <p className="text-[11px] text-slate-500">SLT-Mobitel internal assistant</p>
             </div>
           </div>
           <button
@@ -102,7 +95,7 @@ export default function Sidebar({ open, onClose }) {
           <button
             type="button"
             onClick={goNewChat}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#064e3b] px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-mobitel px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-mobitel-dark"
           >
             <MessageSquarePlus className="h-4 w-4" />
             + New Chat
@@ -160,18 +153,20 @@ export default function Sidebar({ open, onClose }) {
                 <Shield className="h-4 w-4" />
                 Audit logs
               </NavLink>
+              <NavLink to="/admin/settings" className={navClass} onClick={onClose}>
+                <Settings className="h-4 w-4" />
+                System settings
+              </NavLink>
             </>
           )}
         </nav>
 
         <div className="border-t border-slate-100 p-3">
           <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-100 text-xs font-semibold text-[#064e3b]">
-              {initials(user?.name)}
-            </div>
+            <Avatar name={user?.name} src={user?.avatar_url} size="sm" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-slate-900">{user?.name}</p>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-teal-800">
+              <p className="truncate text-sm font-semibold text-ink">{user?.name}</p>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-mobitel-dark">
                 {user?.role || "REGIONAL"}
               </p>
               <p className="text-[11px] text-slate-500">{user?.region || "WESTERN"}</p>
@@ -204,7 +199,7 @@ function ConversationGroup({ label, rows, sessionId, onOpen }) {
               onClick={() => onOpen(row.id)}
               className={`w-full truncate rounded-xl px-3 py-2 text-left text-sm transition ${
                 sessionId === row.id
-                  ? "bg-teal-50 font-medium text-[#064e3b]"
+                  ? "bg-slt-blue/10 font-medium text-slt-blue"
                   : "text-slate-600 hover:bg-slate-50"
               }`}
             >

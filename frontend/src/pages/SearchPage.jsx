@@ -36,7 +36,7 @@ export default function SearchPage() {
   return (
     <section className="space-y-6">
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-teal-900">Search approved knowledge</h2>
+        <h2 className="text-xl font-semibold text-slt-blue">Search approved knowledge</h2>
         <p className="mt-1 max-w-2xl text-sm text-slate-500">
           This is retrieval only — not the chatbot. The API uses your role ({user.role}
           {user.region ? `, ${user.region}` : ""}) and returns <strong>approved</strong> snippets you
@@ -60,7 +60,7 @@ export default function SearchPage() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded-md bg-teal-800 px-4 py-2 text-sm text-white hover:bg-teal-700 disabled:opacity-60"
+            className="rounded-md bg-slt-blue px-4 py-2 text-sm text-white hover:bg-slt-blue-dark disabled:opacity-60"
           >
             {busy ? "Searching…" : "Search"}
           </button>

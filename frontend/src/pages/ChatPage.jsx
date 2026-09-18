@@ -36,12 +36,12 @@ const markdownComponents = {
   li: ({ children }) => <li className="leading-relaxed">{children}</li>,
   strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
   a: ({ href, children }) => (
-    <a href={href} className="font-medium text-teal-700 underline underline-offset-2" target="_blank" rel="noreferrer">
+    <a href={href} className="font-medium text-slt-blue underline underline-offset-2" target="_blank" rel="noreferrer">
       {children}
     </a>
   ),
   blockquote: ({ children }) => (
-    <blockquote className="my-2 border-l-2 border-teal-200 pl-3 text-slate-600">{children}</blockquote>
+    <blockquote className="my-2 border-l-2 border-mobitel pl-3 text-slate-600">{children}</blockquote>
   ),
   table: ({ children }) => (
     <div className="my-2 overflow-x-auto rounded-lg border border-slate-200">
@@ -55,7 +55,7 @@ const markdownComponents = {
     const inline = !className;
     if (inline) {
       return (
-        <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.8em] text-teal-800" {...props}>
+        <code className="rounded bg-page px-1 py-0.5 font-mono text-[0.8em] text-slt-blue" {...props}>
           {children}
         </code>
       );
@@ -142,10 +142,10 @@ function EmptyState({ user, onHover, onSelect }) {
   return (
     <div className="flex h-full items-center justify-center px-4 py-10">
       <div className="w-full max-w-2xl text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#064e3b] text-white shadow-sm">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slt-blue text-white shadow-sm">
           <Bot className="h-7 w-7" />
         </div>
-        <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-900">
+        <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slt-blue">
           Good day! How can I assist you with SLT operations today?
         </h2>
         <p className="mt-2 text-sm text-slate-500">{roleSubtitle(user)}</p>
@@ -159,13 +159,13 @@ function EmptyState({ user, onHover, onSelect }) {
                 onMouseEnter={() => onHover(item.title)}
                 onFocus={() => onHover(item.title)}
                 onClick={() => onSelect(item.title)}
-                className="group rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-teal-300 hover:bg-teal-50/60 hover:shadow-md"
+                className="group rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-mobitel hover:bg-mobitel/10 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <Icon className="h-5 w-5 text-[#047857] transition group-hover:scale-110" />
-                  <ArrowUp className="h-4 w-4 rotate-45 text-slate-300 opacity-0 transition group-hover:opacity-100 group-hover:text-teal-600" />
+                  <Icon className="h-5 w-5 text-mobitel transition group-hover:scale-110" />
+                  <ArrowUp className="h-4 w-4 rotate-45 text-slate-300 opacity-0 transition group-hover:opacity-100 group-hover:text-slt-blue" />
                 </div>
-                <p className="mt-3 text-sm font-medium text-slate-800 group-hover:text-[#064e3b]">{item.title}</p>
+                <p className="mt-3 text-sm font-medium text-ink group-hover:text-slt-blue">{item.title}</p>
               </button>
             );
           })}
@@ -206,13 +206,13 @@ function MessageActions({ content, messageId, feedback, onFeedback }) {
         className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
         aria-label="Copy response"
       >
-        {copied ? <Check className="h-4 w-4 text-[#047857]" /> : <Copy className="h-4 w-4" />}
+        {copied ? <Check className="h-4 w-4 text-mobitel" /> : <Copy className="h-4 w-4" />}
       </button>
       <button
         type="button"
         onClick={() => onFeedback(messageId, "up")}
         className={`rounded-lg p-1.5 transition hover:bg-slate-100 ${
-          feedback === "up" ? "text-[#047857]" : "text-slate-400 hover:text-slate-700"
+          feedback === "up" ? "text-mobitel" : "text-slate-400 hover:text-slate-700"
         }`}
         aria-label="Helpful"
       >
@@ -235,15 +235,15 @@ function MessageActions({ content, messageId, feedback, onFeedback }) {
 function TypingIndicator() {
   return (
     <div className="flex items-start gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#064e3b] text-white">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slt-blue text-white">
         <Bot className="h-4 w-4" />
       </div>
       <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-slate-200/80 bg-white px-5 py-4 shadow-sm">
         <div className="flex items-center gap-2 text-sm text-slate-500">
           <span className="flex gap-1">
-            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-teal-600 [animation-delay:-0.3s]" />
-            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-teal-600 [animation-delay:-0.15s]" />
-            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-teal-600" />
+            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-mobitel [animation-delay:-0.3s]" />
+            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-mobitel [animation-delay:-0.15s]" />
+            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-mobitel" />
           </span>
           AI is searching documents...
         </div>
@@ -365,7 +365,7 @@ export default function ChatPage() {
   const empty = messages.length === 0 && !busy;
 
   return (
-    <section className="flex h-full min-h-0 flex-1 flex-col bg-slate-50 pt-12 md:pt-0">
+    <section className="flex h-full min-h-0 flex-1 flex-col bg-page pt-12 md:pt-0">
       <div className="min-h-0 flex-1 overflow-y-auto">
         {empty ? (
           <EmptyState user={user} onHover={setQuery} onSelect={fillAndSend} />
@@ -381,10 +381,10 @@ export default function ChatPage() {
               if (message.role === "user") {
                 return (
                   <div key={message.id} className="flex items-end justify-end gap-3">
-                    <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-teal-800 px-4 py-3 text-sm text-white shadow-sm">
+                    <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-slt-blue px-4 py-3 text-sm text-white shadow-sm">
                       <p className="whitespace-pre-wrap">{message.content}</p>
                     </div>
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-100 text-[#064e3b]">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slt-blue/10 text-slt-blue">
                       <User className="h-4 w-4" />
                     </div>
                   </div>
@@ -392,7 +392,7 @@ export default function ChatPage() {
               }
               return (
                 <div key={message.id} className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#064e3b] text-white">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slt-blue text-white">
                     <Bot className="h-4 w-4" />
                   </div>
                   <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-slate-200/80 bg-white px-5 py-4 text-slate-800 shadow-sm">
@@ -410,7 +410,7 @@ export default function ChatPage() {
                                 navigator.clipboard.writeText(citationLabel(item));
                               }
                             }}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700 transition hover:border-teal-400 hover:bg-teal-100"
+                            className="inline-flex items-center gap-1.5 rounded-full border border-mobitel/30 bg-mobitel/10 px-3 py-1 text-xs font-medium text-mobitel-dark transition hover:border-mobitel hover:bg-mobitel/20"
                             target={item.source_url ? "_blank" : undefined}
                             rel={item.source_url ? "noreferrer" : undefined}
                           >
@@ -438,7 +438,7 @@ export default function ChatPage() {
       </div>
 
       <div className="relative shrink-0 px-4 pb-5 pt-1">
-        <div className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-t from-slate-50 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-t from-page to-transparent" />
         <form onSubmit={onAsk} className="mx-auto w-full max-w-3xl">
           <div className="flex items-end gap-2 rounded-2xl border border-slate-200/80 bg-white/75 p-2 shadow-lg shadow-slate-200/70 backdrop-blur">
             <textarea
@@ -453,7 +453,7 @@ export default function ChatPage() {
             <button
               type="submit"
               disabled={busy || !query.trim()}
-              className="rounded-xl bg-teal-700 p-2.5 text-white transition hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-mobitel p-2.5 text-white transition hover:bg-mobitel-dark disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="Send message"
             >
               <ArrowUp className="h-4 w-4" />

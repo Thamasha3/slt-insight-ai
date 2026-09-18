@@ -10,9 +10,9 @@ function AppShell() {
   const isChat = pathname === "/chat";
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex h-screen overflow-hidden bg-page">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="relative flex min-w-0 flex-1 flex-col bg-slate-50">
+      <div className="relative flex min-w-0 flex-1 flex-col bg-page">
         <button
           type="button"
           onClick={() => setSidebarOpen(true)}

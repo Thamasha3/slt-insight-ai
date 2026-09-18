@@ -27,7 +27,7 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <h2 className="text-lg font-medium text-slate-800">Sign in</h2>
+      <h2 className="text-lg font-medium text-slt-blue">Sign in</h2>
       {error && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       <label className="block text-sm">
         Email
@@ -52,13 +52,13 @@ export default function LoginPage() {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-md bg-teal-800 py-2 text-white hover:bg-teal-700 disabled:opacity-60"
+        className="w-full rounded-md bg-slt-blue py-2 text-white hover:bg-slt-blue-dark disabled:opacity-60"
       >
         {submitting ? "Signing in…" : "Sign in"}
       </button>
       <p className="text-center text-sm text-slate-600">
         No account?{" "}
-        <Link to="/register" className="text-teal-800 underline">
+        <Link to="/register" className="text-slt-blue underline">
           Request access
         </Link>
       </p>

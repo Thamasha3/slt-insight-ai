@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+@theme {
+  --color-slt-blue: #0055A5;
+  --color-slt-blue-dark: #003f7a;
+  --color-mobitel: #00A859;
+  --color-mobitel-dark: #008a49;
+  --color-page: #F8F9FA;
+  --color-ink: #333333;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
   font-family: "Segoe UI", system-ui, sans-serif;
+  background-color: #f8f9fa;
+  color: #333333;
 }

@@ -8,7 +8,7 @@ export default function PendingPage() {
         Your registration is <strong>PENDING</strong>. An administrator must approve your account before you can sign
         in. You will not receive a token until then.
       </p>
-      <Link to="/login" className="inline-block text-sm text-teal-800 underline">
+      <Link to="/login" className="inline-block text-sm text-slt-blue underline">
         Return to sign in
       </Link>
     </div>

@@ -69,13 +69,13 @@ export default function DashboardPage() {
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">{content.title}</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-slt-blue">{content.title}</h2>
         <p className="mt-1 max-w-2xl text-sm text-slate-500">{content.body}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard icon={Shield} label="Assigned Role" value={user.role}>
-          <span className="mt-3 inline-flex rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-800 ring-1 ring-teal-100">
+          <span className="mt-3 inline-flex rounded-full bg-slt-blue/10 px-2.5 py-1 text-xs font-semibold text-slt-blue ring-1 ring-slt-blue/20">
             {user.role}
           </span>
         </StatCard>
@@ -92,18 +92,18 @@ export default function DashboardPage() {
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-base font-semibold text-slate-900">What you have access to</h3>
+        <h3 className="text-base font-semibold text-slt-blue">What you have access to</h3>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{accessBody}</p>
         {user.role === "REGIONAL" && (
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">General</span>
-            <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-800">{region}</span>
+            <span className="rounded-full bg-mobitel/10 px-3 py-1 text-xs font-medium text-mobitel-dark">{region}</span>
           </div>
         )}
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-base font-semibold text-slate-900">Quick actions</h3>
+        <h3 className="text-base font-semibold text-slt-blue">Quick actions</h3>
         <p className="mt-1 text-sm text-slate-500">Jump into Chat with a suggested question.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {QUICK_ACTIONS.map((item) => {
@@ -113,9 +113,9 @@ export default function DashboardPage() {
                 key={item.title}
                 type="button"
                 onClick={() => askChat(item.title)}
-                className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-800 transition hover:border-teal-300 hover:bg-teal-50"
+                className="flex items-start gap-3 rounded-xl border border-slate-200 bg-page px-4 py-3 text-left text-sm font-medium text-ink transition hover:border-mobitel hover:bg-mobitel/10"
               >
-                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#047857]" />
+                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-mobitel" />
                 {item.title}
               </button>
             );
@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
       {user.role === "ADMIN" && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-teal-900">Operations snapshot</h3>
+          <h3 className="text-lg font-semibold text-slt-blue">Operations snapshot</h3>
           {statsError && <p className="mt-3 text-sm text-red-700">{statsError}</p>}
           {stats && (
             <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
@@ -145,7 +145,7 @@ export default function DashboardPage() {
             </p>
           )}
           <div className="mt-4 flex flex-wrap gap-3 text-sm">
-            <Link className="rounded-md bg-teal-800 px-3 py-2 text-white" to="/admin/knowledge">
+            <Link className="rounded-md bg-slt-blue px-3 py-2 text-white hover:bg-slt-blue-dark" to="/admin/knowledge">
               Knowledge base
             </Link>
             <Link className="rounded-md border border-slate-300 px-3 py-2" to="/admin/pending">
@@ -157,19 +157,22 @@ export default function DashboardPage() {
             <Link className="rounded-md border border-slate-300 px-3 py-2" to="/admin/audit">
               Audit logs
             </Link>
+            <Link className="rounded-md border border-slate-300 px-3 py-2" to="/admin/settings">
+              System settings
+            </Link>
           </div>
         </div>
       )}
 
       {user.role === "SUPER" && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-teal-900">Knowledge validation</h3>
+          <h3 className="text-lg font-semibold text-slt-blue">Knowledge validation</h3>
           <p className="mt-2 text-sm text-slate-600">
             Review PENDING documents, approve or reject them, and upload PDF, Word, CSV, or Excel sources.
             User accounts and audit export stay with Admin.
           </p>
           <div className="mt-4">
-            <Link className="rounded-md bg-teal-800 px-3 py-2 text-sm text-white" to="/admin/knowledge">
+            <Link className="rounded-md bg-slt-blue px-3 py-2 text-sm text-white hover:bg-slt-blue-dark" to="/admin/knowledge">
               Open knowledge
             </Link>
           </div>
@@ -184,11 +187,11 @@ function StatCard({ icon: Icon, label, value, children }) {
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-        <span className="rounded-lg bg-teal-50 p-2 text-[#047857]">
+        <span className="rounded-lg bg-mobitel/10 p-2 text-mobitel">
           <Icon className="h-4 w-4" />
         </span>
       </div>
-      <p className="mt-3 text-xl font-semibold text-slate-900">{value}</p>
+      <p className="mt-3 text-xl font-semibold text-ink">{value}</p>
       {children}
     </div>
   );
@@ -198,7 +201,7 @@ function Stat({ label, value, to }) {
   const inner = (
     <>
       <dt className="text-slate-500">{label}</dt>
-      <dd className="text-2xl font-semibold text-teal-900">{value}</dd>
+      <dd className="text-2xl font-semibold text-slt-blue">{value}</dd>
     </>
   );
   if (to) {

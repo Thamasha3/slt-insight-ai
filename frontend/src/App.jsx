@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import AdminUsersPage from "./pages/admin/AdminUsersPage.jsx";
 import AdminPendingPage from "./pages/admin/AdminPendingPage.jsx";
 import AdminAuditPage from "./pages/admin/AdminAuditPage.jsx";
+import SystemSettings from "./pages/admin/SystemSettings.jsx";
 import AdminKnowledgePage from "./pages/admin/AdminKnowledgePage.jsx";
 import SearchPage from "./pages/SearchPage.jsx";
 import ChatPage from "./pages/ChatPage.jsx";
@@ -62,6 +63,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={["ADMIN"]}>
               <AdminAuditPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <ProtectedRoute roles={["ADMIN"]}>
+              <SystemSettings />
             </ProtectedRoute>
           }
         />

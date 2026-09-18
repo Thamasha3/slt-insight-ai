@@ -7,7 +7,8 @@ const REGIONS = ["WESTERN", "SOUTHERN", "NORTHERN", "EASTERN", "CENTRAL"];
 
 export default function AdminKnowledgePage() {
   const { user } = useAuth();
-  const canDelete = user?.role === "ADMIN";
+  const isSuperUser = user?.role === "SUPER";
+  const canStewardDocuments = isSuperUser;
   const [documents, setDocuments] = useState([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -98,11 +99,12 @@ export default function AdminKnowledgePage() {
   return (
     <section className="space-y-6">
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-teal-900">Upload knowledge source</h2>
+        <h2 className="text-xl font-semibold text-slt-blue">Upload knowledge source</h2>
         <p className="mt-1 text-sm text-slate-500">
           Upload <strong>PDF</strong>, <strong>Word (.docx)</strong>, <strong>CSV</strong>, or{" "}
           <strong>Excel (.xlsx)</strong>. Tables are stored as labeled rows (column names kept). Documents stay{" "}
-          <strong>PENDING</strong> until an Admin or Super User approves them. Search only returns APPROVED chunks.
+          <strong>PENDING</strong> until a Super User approves them. Search only returns APPROVED chunks. Admin can
+          upload and preview, but Delete and Approve/Reject are Super User only.
         </p>
         {error && <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
         <form onSubmit={onUpload} className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -158,7 +160,7 @@ export default function AdminKnowledgePage() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded-md bg-teal-800 px-4 py-2 text-sm text-white hover:bg-teal-700 disabled:opacity-60"
+            className="rounded-md bg-slt-blue px-4 py-2 text-sm text-white hover:bg-slt-blue-dark disabled:opacity-60"
           >
             {busy ? "Processing…" : "Upload and extract"}
           </button>
@@ -166,7 +168,7 @@ export default function AdminKnowledgePage() {
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-teal-900">Document management</h2>
+        <h2 className="text-xl font-semibold text-slt-blue">Document management</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b text-slate-500">
@@ -192,19 +194,19 @@ export default function AdminKnowledgePage() {
                   <td>{row.status}</td>
                   <td>{row.chunk_count}</td>
                   <td className="space-x-2 whitespace-nowrap py-2">
-                    <button type="button" className="text-teal-800 hover:underline" onClick={() => showChunks(row.id)}>
+                    <button type="button" className="text-slt-blue hover:underline" onClick={() => showChunks(row.id)}>
                       Preview
                     </button>
-                    {(row.status === "PENDING" || row.status === "REJECTED") && (
+                    {canStewardDocuments && (row.status === "PENDING" || row.status === "REJECTED") && (
                       <button
                         type="button"
-                        className="text-teal-800 hover:underline"
+                        className="text-mobitel-dark hover:underline"
                         onClick={() => act(`/admin/knowledge/${row.id}/approve`)}
                       >
                         Approve
                       </button>
                     )}
-                    {(row.status === "PENDING" || row.status === "APPROVED") && (
+                    {canStewardDocuments && (row.status === "PENDING" || row.status === "APPROVED") && (
                       <button
                         type="button"
                         className="text-amber-800 hover:underline"
@@ -213,7 +215,7 @@ export default function AdminKnowledgePage() {
                         Reject
                       </button>
                     )}
-                    {canDelete && (
+                    {canStewardDocuments && (
                       <button type="button" className="text-red-700 hover:underline" onClick={() => remove(row.id)}>
                         Delete
                       </button>
@@ -230,7 +232,7 @@ export default function AdminKnowledgePage() {
       {preview && (
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-teal-900">Extracted chunks (preview)</h3>
+            <h3 className="font-semibold text-slt-blue">Extracted chunks (preview)</h3>
             <button type="button" className="text-sm text-slate-500" onClick={() => setPreview(null)}>
               Close
             </button>

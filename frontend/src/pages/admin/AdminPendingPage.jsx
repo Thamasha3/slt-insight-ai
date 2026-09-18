@@ -54,7 +54,7 @@ export default function AdminPendingPage() {
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold text-teal-900">Pending account requests</h2>
+      <h2 className="text-xl font-semibold text-slt-blue">Pending account requests</h2>
       <p className="mt-1 text-sm text-slate-500">Assign NORMAL, REGIONAL, or SUPER. ADMIN cannot be granted through this form.</p>
       {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
       {users.length === 0 && <p className="mt-4 text-sm text-slate-500">No pending requests.</p>}
@@ -101,7 +101,7 @@ export default function AdminPendingPage() {
                 <button
                   type="button"
                   onClick={() => approve(row.id)}
-                  className="rounded-md bg-teal-800 px-3 py-1.5 text-sm text-white"
+                  className="rounded-md bg-slt-blue px-3 py-1.5 text-sm text-white hover:bg-slt-blue-dark"
                 >
                   Approve
                 </button>
