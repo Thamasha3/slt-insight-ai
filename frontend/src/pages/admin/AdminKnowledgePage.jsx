@@ -91,6 +91,12 @@ export default function AdminKnowledgePage() {
     try {
       const response = await api.get(`/admin/knowledge/${id}/chunks`);
       setPreview({ id, chunks: response.data });
+      
+      // Automatically scroll to the bottom of the page where the preview renders
+      setTimeout(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+      }, 100);
+      
     } catch {
       setError("Could not load chunks.");
     }
